@@ -3,6 +3,11 @@
 #include<opencv2/opencv.hpp>
 #include<boost/thread/thread.hpp>
 
+#define HIGH_GOAL 0
+#define MID_GOAL 1
+#define LOW_GOAL 2
+#define PYRAMID_GOAL 3
+
 using namespace std;
 using namespace cv;
 
@@ -10,6 +15,7 @@ bool threadRunning, mainRunning;
 
 void threadCam(Mat* cDis);
 void findTargets(Mat &img);
+void classifyTargets(vector< vector<Point> > &contours);
 
 int main(int argc, char **argv){
 	cout << "Starting..." << endl;
@@ -67,11 +73,12 @@ void threadCam(Mat* cDis){
 		Mat camSrc, cFilter, cThresh, cDE;
 		vector<Mat> bgr;
 
-		int de_size = 3;
+		// Generate the kernel for morphology operations
+		int de_size = 7;
 		Mat deMat = getStructuringElement(
-				2, 
-				Size(2*de_size+1, 2*de_size+1),
-				Point(de_size, de_size));
+				MORPH_ELLIPSE, 
+				Size(de_size, de_size), //ellipse inscribed in rect
+				Point(-1, -1)); //anchor at center
 
 		vidCap >> *cDis;
 		threadRunning = true;
@@ -81,10 +88,17 @@ void threadCam(Mat* cDis){
 			vidCap >> camSrc;
 			split(camSrc, bgr);
 
+			// Filter by removing pixels that have non-red presence
+			// Requires thresholding afterwards, otherwise negatives appear
 /* RED   */		cFilter = bgr.at(2) - (bgr.at(0) + bgr.at(1)); /* RED   */
 /* GREEN /		cFilter = bgr.at(1) - (bgr.at(0) + bgr.at(2)); /* GREEN */
 /* BLUE  /		cFilter = bgr.at(0) - (bgr.at(1) + bgr.at(2)); /* BLUE  */
+
+			// All values greater than 50 become white
+			// Everything else is black
 			threshold(cFilter, cThresh, 50, 255, CV_THRESH_BINARY);
+			
+			// Removes small holes in image, erosion and dilation operation
 			morphologyEx(cThresh, cDE, MORPH_CLOSE, deMat);//, Point(-1, -1), 3);
 
 			bgr.at(2) += cDE;
@@ -109,9 +123,22 @@ void threadCam(Mat* cDis){
 }
 
 void findTargets(Mat &img){
-	Mat cannyImg;
-	vector<vector<Point> > contours;
-	vector<Vec4i> hierarchy;
-	
-	findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+  // Locates all regions of interest in the image
+  Mat cannyImg;
+  vector<vector<Point> > contours;
+  vector<Vec4i> hierarchy;
+  
+  // find all contours in a binary image
+  // full hierarchy of nested contours
+  // returns only end-points of contours
+  // no offset
+  findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+  // Find the bounding-box statistics for the important contours
+  
 }
+
+void classifyTargets(vector<vector<Point> > &contours){
+  // Classifies targets as HIGH_GOAL, MID_GOAL, LOW_GOAL
+}
+
