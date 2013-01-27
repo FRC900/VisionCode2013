@@ -129,7 +129,7 @@ void findTargets(Mat &img){
   Mat cannyImg;
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
-  RNG rng(12345);
+  
   
   // find all contours in a binary image
   // full hierarchy of nested contours
@@ -150,7 +150,7 @@ void findTargets(Mat &img){
 
   // Draw the bbox for each contour
   for(int i=0; i<contours.size(); i++){
-    Scalar color = Scalar( rng.uniform(0,255), rng.uniform(0,255), rng.uniform(0,255));
+    Scalar color = Scalar( 255, 255, 255);
     drawContours( img, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point());
     // draw rect, provide top-left and bottomr-right corners
     rectangle(img, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
