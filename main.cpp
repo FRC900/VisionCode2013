@@ -2,6 +2,7 @@
 #include<iostream>
 #include<opencv2/opencv.hpp>
 #include<boost/thread/thread.hpp>
+#include<list>
 
 #define HIGH_GOAL 0
 #define MID_GOAL 1
@@ -15,15 +16,14 @@ bool threadRunning, mainRunning;
 
 void threadCam(Mat* cDis);
 void findTargets(Mat &img);
-void classifyTargets(vector< vector<Point> > &contours);
 
 int main(int argc, char **argv){
+
 	cout << "Starting..." << endl;
 	mainRunning = true;
 
 	int key = -1;
 	//namedWindow("src", CV_WINDOW_AUTOSIZE);
-
 	//namedWindow("cFilter", CV_WINDOW_AUTOSIZE);
         namedWindow("cDisplay", CV_WINDOW_AUTOSIZE);
 
@@ -86,26 +86,28 @@ void threadCam(Mat* cDis){
 		while(mainRunning){
 			cout << "cap..." << endl;
 			vidCap >> camSrc;
+
 			split(camSrc, bgr);
 
 			// Filter by removing pixels that have non-red presence
 			// Requires thresholding afterwards, otherwise negatives appear
-/* RED   */		cFilter = bgr.at(2) - (bgr.at(0) + bgr.at(1)); /* RED   */
-/* GREEN /		cFilter = bgr.at(1) - (bgr.at(0) + bgr.at(2)); /* GREEN */
+/* RED   /		cFilter = bgr.at(2) - (bgr.at(0) + bgr.at(1)); /* RED   */
+/* GREEN */		cFilter = bgr.at(1) - (bgr.at(0) + bgr.at(2)); /* GREEN */
 /* BLUE  /		cFilter = bgr.at(0) - (bgr.at(1) + bgr.at(2)); /* BLUE  */
 
 			// All values greater than 50 become white
 			// Everything else is black
-			threshold(cFilter, cThresh, 50, 255, CV_THRESH_BINARY);
+			threshold(cFilter, cThresh, 10, 255, CV_THRESH_BINARY);
 			
 			// Removes small holes in image, erosion and dilation operation
 			morphologyEx(cThresh, cDE, MORPH_CLOSE, deMat);//, Point(-1, -1), 3);
+			findTargets(cDE);
 
 			bgr.at(2) += cDE;
 
 			merge(bgr, cDE);
 
-			*cDis = cDE.clone();
+      			*cDis = cDE.clone();
 		}
 		cout << "Releasing Resources...";
 		vidCap.release();
@@ -127,6 +129,7 @@ void findTargets(Mat &img){
   Mat cannyImg;
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
+  RNG rng(12345);
   
   // find all contours in a binary image
   // full hierarchy of nested contours
@@ -134,11 +137,26 @@ void findTargets(Mat &img){
   // no offset
   findContours(img, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-  // Find the bounding-box statistics for the important contours
-  
-}
+  // Find the bounding-box statistics for the contours
+  vector<Rect> boundRect(contours.size());
+  vector<vector<Point> > contours_poly(contours.size());
 
-void classifyTargets(vector<vector<Point> > &contours){
-  // Classifies targets as HIGH_GOAL, MID_GOAL, LOW_GOAL
+  // Approximate polygons and create bounding rectangles
+  //TODO: Only do this for most prominent bboxes, filter small ones
+  for(int i=0; i<contours.size(); i++){
+    approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true);
+    boundRect[i] = boundingRect(Mat(contours_poly[i]));
+  }
+
+  // Draw the bbox for each contour
+  for(int i=0; i<contours.size(); i++){
+    Scalar color = Scalar( rng.uniform(0,255), rng.uniform(0,255), rng.uniform(0,255));
+    drawContours( img, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point());
+    // draw rect, provide top-left and bottomr-right corners
+    rectangle(img, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
+    char* text;
+    sprintf(text, "(%d, %d)", boundRect[i].height, boundRect[i].width);
+    putText(img, text, boundRect[i].br(), FONT_HERSHEY_COMPLEX_SMALL, 0.8, color, 1, CV_AA);
+  }
 }
 
