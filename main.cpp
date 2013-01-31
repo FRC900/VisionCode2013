@@ -11,6 +11,8 @@
 #include <errno.h>
 #include <unistd.h>
 
+#define SERVERPORT 5000
+
 #define HIGH_GOAL 0
 #define MID_GOAL 1
 #define LOW_GOAL 2
@@ -24,7 +26,7 @@ bool threadRunning, mainRunning;
 void threadCam(Mat* cDis);
 void findTargets(Mat &img);
 void threadServer(Mat* cDis);
-
+v
 int main(int argc, char **argv){
 
 	cout << "Starting..." << endl;
@@ -69,23 +71,30 @@ void threadServer(Mat* cDis){
   int connfd = 0;
   struct sockaddr_in serv_addr;
 
+  // Create the file descriptor
   int listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
   memset(&serv_addr, '0', sizeof(serv_addr));
 
+  // Setup the address parameters
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  serv_addr.sin_port = htons(5000);
+  serv_addr.sin_port = htons(SERVERPORT);
 
+  // Bind socket to the port
   bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
   
+  // Mark as passive socket (used to accept connections)
   listen(listenfd, 10);
 
   while(1){
+    // A blocking call, waits for a message/connection
     connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
 
+    // Respond with an image
     write(connfd, cDis->data, cDis->rows * cDis->cols * cDis->elemSize());
-
+    
+    // Close the connection, and wait for another
     close(connfd);
     sleep(1);
   }
