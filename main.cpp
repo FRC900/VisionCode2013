@@ -1,8 +1,15 @@
-#include<stdio.h>
-#include<iostream>
-#include<opencv2/opencv.hpp>
-#include<boost/thread/thread.hpp>
-#include<list>
+#include <stdio.h>
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include <boost/thread/thread.hpp>
+#include <list>
+
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <errno.h>
+#include <unistd.h>
 
 #define HIGH_GOAL 0
 #define MID_GOAL 1
@@ -16,6 +23,7 @@ bool threadRunning, mainRunning;
 
 void threadCam(Mat* cDis);
 void findTargets(Mat &img);
+void threadServer(Mat* cDis);
 
 int main(int argc, char **argv){
 
@@ -30,6 +38,7 @@ int main(int argc, char **argv){
 	Mat cDisplay;
 	cout << "Starting thread..." << endl;
 	boost::thread camThread(threadCam, &cDisplay);
+	boost::thread serverThread(threadServer, &cDisplay);
 	cout << "Thread started...";
 
 	cout << "Waiting for thread...";
@@ -50,9 +59,37 @@ int main(int argc, char **argv){
 	mainRunning = false;
 
 	camThread.join();
+	serverThread.join();
 
 	cDisplay.release();
 	return 0;
+}
+
+void threadServer(Mat* cDis){
+  int connfd = 0;
+  struct sockaddr_in serv_addr;
+
+  int listenfd = socket(AF_INET, SOCK_STREAM, 0);
+
+  memset(&serv_addr, '0', sizeof(serv_addr));
+
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  serv_addr.sin_port = htons(5000);
+
+  bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+  
+  listen(listenfd, 10);
+
+  while(1){
+    connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
+
+    write(connfd, cDis->data, cDis->rows * cDis->cols * cDis->elemSize());
+
+    close(connfd);
+    sleep(1);
+  }
+
 }
 
 void threadCam(Mat* cDis){
