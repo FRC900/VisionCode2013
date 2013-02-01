@@ -9,16 +9,24 @@
 #include <errno.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <opencv2/opencv.hpp>
 
 //#define IPADDR "127.0.0.1"
 #define IPADDR "192.168.1.100"
 #define IPPORT 5000
 
 using namespace std;
+using namespace cv;
 
 int main(){
+	cout << SSIZE_MAX << endl;
   int sockfd, n=0;
-  char recvBuff[2048];
+  //char recvBuff[32000-1];
+  char recvBuff[921600];
+  //int sz = 480*640*3;
+  //char recvBuff[sz];
+
+  cout << "YO DUDE" << endl;
 
   struct sockaddr_in serv_addr;
 
@@ -43,12 +51,24 @@ int main(){
     return 1;
   }
 
-  while((n=read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0){
-    recvBuff[n] = 0;
-    if(fputs(recvBuff, stdout) == EOF){
-      cout << "fputs error!" << endl;
-    }
+  // Max readable is 1436
+  int i = 0;
+  while((n=read(sockfd, &recvBuff[i], sizeof(recvBuff)-1)) > 0){
+    i+=n;
+    //cout << "I read something! " << n;
+    //recvBuff[n] = 0;
+    //if(fputs(recvBuff, stdout) == EOF){
+    //  cout << "fputs error!" << endl;
+    //}
   }
+  //recvBuff[921600]=0;
+  //cout << recvBuff << endl;
+  cout << "Displaying: " << i << endl;
+
+  //Mat cDisplay;
+  //cDisplay = Mat(480, 640, CV_32FC3, (void*)recvBuff);
+  //namedWindow("hello", CV_WINDOW_AUTOSIZE);
+  //imshow("hello", cDisplay);
 
   if(n<0){
     cout << "Read error" << endl;

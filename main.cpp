@@ -26,7 +26,7 @@ bool threadRunning, mainRunning;
 void threadCam(Mat* cDis);
 void findTargets(Mat &img);
 void threadServer(Mat* cDis);
-v
+
 int main(int argc, char **argv){
 
 	cout << "Starting..." << endl;
@@ -94,6 +94,9 @@ void threadServer(Mat* cDis){
     // Respond with an image
     write(connfd, cDis->data, cDis->rows * cDis->cols * cDis->elemSize());
     
+    // Print image dimensions
+    cout << cDis->rows << " AND " << cDis->cols << endl;
+
     // Close the connection, and wait for another
     close(connfd);
     sleep(1);
