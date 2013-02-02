@@ -9,3 +9,6 @@ Focal Point - 2.8
 
 ===DO NOT USE THIS CAMERA, TOO LOW RESOLUTION===
 Axis IP Camera C1011-M
+
+
+Stuff:
