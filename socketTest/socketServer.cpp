@@ -10,6 +10,7 @@
 #include <iostream>
 
 // Code from: www.thegeekstuff.com/2011/12/c-socket-programming
+#define IPPORT 5000
 
 int main(){
   int connfd = 0;
@@ -24,7 +25,7 @@ int main(){
 
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  serv_addr.sin_port = htons(5000);
+  serv_addr.sin_port = htons(IPPORT);
   
   bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
   

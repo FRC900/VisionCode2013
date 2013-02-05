@@ -10,8 +10,8 @@
 #include <arpa/inet.h>
 #include <iostream>
 
-//#define IPADDR "127.0.0.1"
-#define IPADDR "192.168.1.100"
+#define IPADDR "127.0.0.1"
+//#define IPADDR "192.168.1.100"
 #define IPPORT 5000
 
 using namespace std;
