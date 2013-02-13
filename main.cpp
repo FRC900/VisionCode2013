@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include <time.h>
+
 #define SERVERPORT 1130
 
 #define HIGH_GOAL 0
@@ -27,6 +29,8 @@ bool threadRunning, mainRunning;
 
 int m_area;
 Rect m_rect;
+time_t started;
+time_t timer;
 
 void threadCam(Mat* cDis);
 void findTargets(Mat &img);
@@ -145,16 +149,29 @@ void threadCam(Mat* cDis){
 	  vidCap >> *cDis;
 	  threadRunning = true;
 	  
+	  timer = time(NULL);
+	  time_t last = timer;
+	  int num_frames = 0;
+
 	  while(mainRunning){
 	    //cout << "cap..." << endl;
 	    vidCap >> camSrc;
+	    num_frames++;
+	    timer = time(&timer);
+
+	    if((timer-last) > 10){
+	      last = timer;
+	      cout << "FPS: " << double(num_frames) / double(10) << endl;
+	      cout << "Rows: " << camSrc.rows << " Cols: " << camSrc.cols << endl;
+	      num_frames = 0;
+	    }
 	    
 	    split(camSrc, bgr);
 	    
 	    // Filter by removing pixels that have non-red presence
 	    // Requires thresholding afterwards, otherwise negatives appear
-	    /* RED   */		cFilter = bgr.at(2) - (bgr.at(0) + bgr.at(1)); /* RED   */
-	    /* GREEN /		cFilter = bgr.at(1) - (bgr.at(0) + bgr.at(2)); /* GREEN */
+	    /* RED   /		cFilter = bgr.at(2) - (bgr.at(0) + bgr.at(1)); /* RED   */
+	    /* GREEN */		cFilter = bgr.at(1) - (bgr.at(0) + bgr.at(2)); /* GREEN */
 	    /* BLUE  /		cFilter = bgr.at(0) - (bgr.at(1) + bgr.at(2)); /* BLUE  */
 	    
 	    // All values greater than 50 become white
