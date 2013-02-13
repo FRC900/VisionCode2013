@@ -12,8 +12,11 @@
 #include <opencv2/opencv.hpp>
 
 //#define IPADDR "127.0.0.1"
-#define IPADDR "192.168.1.100"
-#define IPPORT 5000
+//#define IPADDR "192.168.1.100"
+//#define IPPORT 5000
+
+#define IPADDR "10.9.0.40"
+#define IPPORT 1130
 
 using namespace std;
 using namespace cv;
@@ -22,11 +25,11 @@ int main(){
 	cout << SSIZE_MAX << endl;
   int sockfd, n=0;
   //char recvBuff[32000-1];
-  char recvBuff[921600];
+  //char recvBuff[921600];
   //int sz = 480*640*3;
   //char recvBuff[sz];
 
-  cout << "YO DUDE" << endl;
+  char recvBuff[26];
 
   struct sockaddr_in serv_addr;
 
@@ -62,7 +65,7 @@ int main(){
     //}
   }
   //recvBuff[921600]=0;
-  //cout << recvBuff << endl;
+  cout << recvBuff << endl;
   cout << "Displaying: " << i << endl;
 
   //Mat cDisplay;
