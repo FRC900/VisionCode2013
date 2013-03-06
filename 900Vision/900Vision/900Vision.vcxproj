@@ -49,12 +49,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\include;C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\include\opencv;C:\Users\IBM_ADMIN\tbb41_20121003oss\include;C:\Users\IBM_ADMIN\tbb41_20121003oss\include\tbb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>S:\libs\opencv\build\include;S:\libs\opencv\build\include\opencv;S:\libs\tbb41_20130116oss\include;S:\libs\tbb41_20130116oss\include\tbb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>"C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\x86\vc10\lib\opencv_core243d.lib";"C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\x86\vc10\lib\opencv_highgui243d.lib";"C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\x86\vc10\lib\opencv_video243d.lib";"C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\x86\vc10\lib\opencv_ml243d.lib";"C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\x86\vc10\lib\opencv_legacy243d.lib";"C:\Users\IBM_ADMIN\OpenCV2.4.3\opencv\build\x86\vc10\lib\opencv_imgproc243d.lib";"C:\Users\IBM_ADMIN\tbb41_20121003oss\lib\ia32\vc10\tbb.lib";"C:\Users\IBM_ADMIN\tbb41_20121003oss\lib\ia32\vc10\tbb_debug.lib";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>"S:\libs\opencv\build\x86\vc10\lib\opencv_core244d.lib";"S:\libs\opencv\build\x86\vc10\lib\opencv_highgui244d.lib";"S:\libs\opencv\build\x86\vc10\lib\opencv_video244d.lib";"S:\libs\opencv\build\x86\vc10\lib\opencv_ml244d.lib";"S:\libs\opencv\build\x86\vc10\lib\opencv_legacy244d.lib";"S:\libs\opencv\build\x86\vc10\lib\opencv_imgproc244d.lib";"S:\libs\tbb41_20130116oss\lib\ia32\vc10\tbb.lib";"S:\libs\tbb41_20130116oss\lib\ia32\vc10\tbb_debug.lib";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
