@@ -106,12 +106,10 @@ void threadServer(Mat* cDis){
     //write(connfd, cDis->data, cDis->rows * cDis->cols * cDis->elemSize());
     
     // Respond with rectangle area
-    while(1){
     cout << "before the sprintf" << endl;
     char* sArea = new char[50];
     sprintf(sArea, "%d", m_area);
     write(connfd, sArea, sizeof(sArea));
-    }
 
     // Print image dimensions
     //cout << cDis->rows << " AND " << cDis->cols << endl;
